@@ -1,26 +1,30 @@
-def calculate_monthly_payment(principal, annual_rate, years):
-    r = (annual_rate / 100) / 12
+import os
 
-    n = years * 12
+os.system('cls')
+
+def räkna_ut_betalning(belopp, årsränta, år):
+    r = (årsränta / 100) / 12
+
+    n = år * 12
 
     if r == 0:
-        return principal / n 
+        return belopp / n 
 
-    A = (principal * r) / (1 - (1 + r) ** -n)
+    A = (belopp * r) / (1 - (1 + r) ** -n)
     return A
 
 
-principal = float(input("Lånebelopp: "))
+belopp = float(input("Lånebelopp: "))
 
 while True:
     try:
-        annual_rate = float(input("Årsränta (%): "))
+        årsränta = float(input("Årsränta (%): "))
         break
 
     except:
-        print("did you put in a comma or a period?")
+        print("lade du in ett komma eller punkt?")
 
-years = int(input("Löptid (år): "))
+år = int(input("Löptid (år): "))
 
-payment = calculate_monthly_payment(principal, annual_rate, years)
-print(f"Din månatliga betalning är: {payment:.2f} kr")
+betalning = räkna_ut_betalning(belopp, årsränta, år)
+print(f"Din månatliga betalning är: {betalning:.2f} kr")
