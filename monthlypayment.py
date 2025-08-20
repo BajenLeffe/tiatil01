@@ -12,7 +12,13 @@ def calculate_monthly_payment(principal, annual_rate, years):
 
 principal = float(input("Lånebelopp: "))
 
-annual_rate = float(input("Årsränta (%): "))
+while True:
+    try:
+        annual_rate = float(input("Årsränta (%): "))
+        break
+
+    except:
+        print("did you put in a comma or a period?")
 
 years = int(input("Löptid (år): "))
 
