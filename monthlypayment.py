@@ -12,7 +12,7 @@ def räkna_ut_betalning(belopp, årsränta, år):
 
     A = (belopp * r) / (1 - (1 + r) ** -n)
     return A
-
+u
 
 belopp = float(input("Lånebelopp: "))
 
