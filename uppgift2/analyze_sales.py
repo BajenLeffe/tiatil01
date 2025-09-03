@@ -3,9 +3,11 @@ import csv
 import os
 import locale
 
+os.system('cls')
 
 def load_sales(filename):
-    products = {}  #ordbok dictionary
+    products = {} 
+    all_products = []
 
     with open(filename, 'r') as file:
         reader = csv.DictReader(file)
@@ -21,23 +23,24 @@ def load_sales(filename):
             else:
                 products[product] = sales
                 
-    return products
+    return all_products, products
                 
-def analyze_sales_data():    
-    #TODO: Hitta den mest sålda produkten (TIPS! Använd Counter från collections)
+def analyze_sales_data(all_products, products):    
+    # Hittade mest sålda produkten med Counter
+    product_counts = Counter(all_products)
+    most_sold_product, count = product_counts.most_common(1)[0]
     
+    # Hittade mest lukrativa produkten med max och dictionary
+    most_lucrative_product = max(products, key=products.get)
+    lucrative_amount = products[most_lucrative_product]
     
-    #TODO: Hitta den mest lukrativa produkten med max: max(products, key=products.get)
-    most_lucrative_product = 0
-    
-    print(f"Mest sålda produkt: ??, Antal: ??")
-    print(f"Mest lukrativa produkt: \"{most_lucrative_product}\" med försäljning på {locale.currency(0,grouping=True)}") #TODO: BONUS: kan du skapa en funktion som skriver ut rätt formaterad valuta istället för detta?
+    print(f"Mest sålda produkt: {most_sold_product}, Antal: {count}")
+    print(f"Mest lukrativa produkt: {most_lucrative_product} med försäljning på {locale.currency(lucrative_amount, grouping=True)}")
 
 
-# Sätt språkinställning till svenska (Sverige) används för att skriva ut formaterad valuta
+# Sätt språkinställning till svenska används för att skriva ut formaterad valuta
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')  
 
-os.system('cls')
+
 all_products, products = load_sales('sales_data.csv')
 analyze_sales_data(all_products, products)
-
