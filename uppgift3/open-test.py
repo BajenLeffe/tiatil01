@@ -6,46 +6,36 @@ def format_currency(value):
     return locale.currency(value,grouping=True)
 
 def load_data(filename): 
-    products = []  # Flytta produkter in till listan
-    with open(filename, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            id = int(row['id'])
-            name = row['name']
-            desc = row['desc']
-            price = float(row['price'])
-            quantity = int(row['quantity'])
-            
-            products.append(
-                {                   
-                    "id": id,       
-                    "name": name,
-                    "desc": desc,
-                    "price": price,
-                    "quantity": quantity
-                }
-            )
+    products = []
+    try:
+        with open(filename, encoding='utf-8') as file: 
+            reader = csv.DictReader(file)
+            for row in reader:
+                try:
+                    product = {
+                        "id": int(row['id']),
+                        "name": row['name'],
+                        "desc": row['desc'],
+                        "price": float(row['price']),
+                        "quantity": int(row['quantity'])
+                    }
+                    products.append(product)
+                except ValueError as e:
+                    print(f"Error med laddning av rad: {row}. Error: {e}")
+    except FileNotFoundError:
+        print(f"Error: kunde inte hitta felet {filename}")
+    except Exception as e:
+        print(f"Error med laddning av data: {e}")
+    
+
+    products.sort(key=lambda x: x['id'])
     return products
-
-def get_product_by_id(products, product_id):
-    
-    for product in products:
-        if product['id'] == product_id:
-            return product
-    return None
-
-def remove_product_by_id(products, product_id):
-    
-    for i, product in enumerate(products):
-        if product['id'] == product_id:
-            return products.pop(i)
-    return None
-
+                    
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')  
 
-products = load_data('db_products.csv')  # Laddar in hela CSV filen
+os.system('cls' )
 
-os.system('cls')
+products = load_data('db_products.csv')
 
 for idx, product in enumerate(products, 1):
-    print(f"{idx}. {product['name']} - {format_currency(product['price'])}")
+    print(f"{idx}. (ID:{product['id']}) {product['name']} - {format_currency(product['price'])}")
