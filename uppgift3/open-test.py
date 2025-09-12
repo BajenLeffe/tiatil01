@@ -2,15 +2,12 @@ import csv
 import os
 import locale
 
-
-products = []           #lista
-
 def format_currency(value):
     return locale.currency(value,grouping=True)
 
-
 def load_data(filename): 
-    with open(filename, 'r') as file:       #öppnar en fil med read-rättighet
+    products = []  # Flytta produkter in till listan
+    with open(filename, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
             id = int(row['id'])
@@ -28,26 +25,27 @@ def load_data(filename):
                     "quantity": quantity
                 }
             )
-   
+    return products
 
+def get_product_by_id(products, product_id):
+    
+    for product in products:
+        if product['id'] == product_id:
+            return product
+    return None
 
-#TODO: hur gör man så funktionen load_data returnerar products istället?
-#TODO: gör så man kan se en numrerad lista som börjar på 1.
-#TODO: skriv en funktion som returnerar en specifik produkt med hjälp av id
-#TODO: skriv en funktion som tar bort en specifik produkt med hjälp av id
-
+def remove_product_by_id(products, product_id):
+    
+    for i, product in enumerate(products):
+        if product['id'] == product_id:
+            return products.pop(i)
+    return None
 
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')  
 
-load_data('db_products.csv')
+products = load_data('db_products.csv')  # Laddar in hela CSV filen
 
 os.system('cls')
-    
-products = load_data('db_products.csv')
 
 for idx, product in enumerate(products, 1):
-    print(f"{idx}. {product['name']} - {product['price']} kr")
-
-
-
-
+    print(f"{idx}. {product['name']} - {format_currency(product['price'])}")
