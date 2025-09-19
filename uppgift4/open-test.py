@@ -19,15 +19,30 @@ def load_data(filename):
                 }
                 products.append(product)
     
-
     products.sort(key=lambda x: x['id'])
     return products
+
+def get_product_by_id(products, product_id):
+    for product in products:
+        if product['id'] == product_id:
+            return product
+    return None
+
+def remove_product_by_id(products, product_id):
+    return [p for p in products if p['id'] != product_id]
                     
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')  
 
 os.system('cls')
 
 products = load_data('db_products.csv')
+
+
+product = get_product_by_id(products, 1)
+if product:
+    print(f"Found product: {product['name']}")
+
+products = remove_product_by_id(products, 1)
 
 for idx, product in enumerate(products, 1):
     print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
