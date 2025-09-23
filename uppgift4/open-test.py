@@ -43,11 +43,17 @@ os.system('cls')
 
 products = load_data('db_products.csv')
 
-product = get_product_by_id(products, 1)
+product_id_to_get = int(input("ange ID på produkten du söker: "))
+product = get_product_by_id(products, product_id_to_get)
 if product:
-    print(f"Found product: {product['name']}")
+    print(f"hittade produkt med ID {product_id_to_get}: {product['name']} {product['desc']} - {format_currency(product['price'])}")
+else:
+    print(f"ingen produkt hittades med detta ID {product_id_to_get}")
 
-products = remove_product_by_id(products, 1)
 
+product_id_to_remove = int(input("\nange ID på produkten du vill bli av med: "))
+products = remove_product_by_id(products, product_id_to_remove)
+
+print("\ndatabasen med produkten borttagen:\n")
 for idx, product in enumerate(products, 1):
     print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
