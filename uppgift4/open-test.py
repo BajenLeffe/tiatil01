@@ -59,32 +59,69 @@ def add_product(products):
     print(f"\nprodukten '{new_name}' har lagts till!\n")
     return products
 
+def save_data(filename, products):
+    fieldnames = ['id', 'name', 'desc', 'price', 'quantity']
+    with open(filename, 'w', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(products)
+
+def show_products(products):
+    print("\nAktuell produktlista:\n")
+    for idx, product in enumerate(products, 1):
+        print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
+
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')   
 
 
-os.system('cls')
+filename = 'db_products.csv'
+products = load_data(filename)
 
-products = load_data('db_products.csv')
-
-product_id_to_get = int(input("ange ID på produkten du söker: "))
-product = get_product_by_id(products, product_id_to_get)
-if product:
-    print(f"hittade produkt med ID {product_id_to_get}: {product['name']} {product['desc']} - {format_currency(product['price'])}")
-else:
-    print(f"ingen produkt hittades med detta ID {product_id_to_get}")
-
-
-product_id_to_remove = int(input("\nange ID på produkten du vill bli av med: "))
-products = remove_product_by_id(products, product_id_to_remove)
-
-print("\ndatabasen med produkten borttagen:\n")
-for idx, product in enumerate(products, 1):
-    print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
-
-choice = input("\nvill du lägga till en ny produkt? (y/n): ").lower()
-if choice == 'y':
-    products = add_product(products)
-
-print("\nslutgiltig produktlista:\n")
-for idx, product in enumerate(products, 1):
-    print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
+while True:
+    os.system('cls')
+    show_products(products)
+    
+    print("\nvälj en åtgärd:")
+    print("1. sök produkt via ID")
+    print("2. ta bort produkt")
+    print("3. lägg till produkt")
+    print("4. avsluta")
+    
+    choice = input("\nvälj (1-4): ")
+    
+    if choice == '1':
+        try:
+            product_id = int(input("\nange ID på produkten du söker: "))
+            product = get_product_by_id(products, product_id)
+            if product:
+                print(f"\nhittade produkt: {product['name']} {product['desc']} - {format_currency(product['price'])}")
+            else:
+                print(f"\ningen produkt hittades med ID {product_id}")
+        except ValueError:
+            print("\nogiltigt ID format")
+    
+    elif choice == '2':
+        try:
+            product_id = int(input("\nange ID på produkten du vill ta bort: "))
+            old_len = len(products)
+            products = remove_product_by_id(products, product_id)
+            if len(products) < old_len:
+                print(f"\nprodukt med ID {product_id} har tagits bort")
+                save_data(filename, products)
+            else:
+                print(f"\ningen produkt hittades med ID {product_id}")
+        except ValueError:
+            print("\nogiltigt ID format")
+    
+    elif choice == '3':
+        products = add_product(products)
+        save_data(filename, products)
+    
+    elif choice == '4':
+        print("\navslutar programmet...")
+        break
+    
+    else:
+        print("\nogiltigt val, försök igen")
+    
+    input("\ntryck Enter för att fortsätta...")
