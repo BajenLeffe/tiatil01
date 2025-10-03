@@ -1,15 +1,18 @@
 import csv
 import os
 import locale
+from colors import bcolors
 
 def format_currency(value):
     return locale.currency(value,grouping=True)
 
 def load_data(filename): 
     products = []
-    with open(filename, encoding='utf-8') as file: 
+    
+    with open(filename, encoding='utf-8', mode='r') as file: 
         reader = csv.DictReader(file)
         for row in reader:
+                
                 product = {
                     "id": int(row['id']),
                     "name": row['name'],
@@ -20,6 +23,7 @@ def load_data(filename):
                 products.append(product)
     
     products.sort(key=lambda x: x['id'])
+
     return products
 
 def get_product_by_id(products, product_id):
@@ -30,17 +34,17 @@ def get_product_by_id(products, product_id):
 
 def remove_product_by_id(products, product_id):
     new_products = []
+
     for product in products:
         if product['id'] != product_id:
             new_products.append(product)
     return new_products
 
-
 def add_product(products):
     print("\nlägg till en ny produkt")
-
-    findmax = max(products, key=lambda biggest: biggest['id'])
-    new_id = findmax['id'] + 1 
+    
+    # ta reda på högsta ID och lägg till 1
+    new_id = max(products, key=lambda x: x['id'])['id'] + 1
     
     new_name = input("ange produktens namn: ")
     new_desc = input("ange produktens beskrivning: ")
@@ -60,16 +64,27 @@ def add_product(products):
     return products
 
 def save_data(filename, products):
-    fieldnames = ['id', 'name', 'desc', 'price', 'quantity']
-    with open(filename, 'w', encoding='utf-8', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(products)
+    try:
+        fieldnames = ['id', 'name', 'desc', 'price', 'quantity']
+        
+        with open(filename, 'w', encoding='utf-8', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(products)
+        return True
+    
+    except:
+        print("\nFEL: kan inte spara - filen är skrivskyddad")
+        return False
 
 def show_products(products):
-    print("\nAktuell produktlista:\n")
+    print(f"\n{bcolors.BOLD}Aktuell produktlista:{bcolors.DEFAULT}\n")
+
     for idx, product in enumerate(products, 1):
-        print(f"{idx}. (ID:{product['id']}) {product['name']} {product['desc']} - {format_currency(product['price'])}")
+        print(f"{bcolors.BLUE}{idx}. {bcolors.DEFAULT}(ID:{bcolors.YELLOW}{product['id']}{bcolors.DEFAULT}) "
+              f"{bcolors.CYAN}{product['name']} {product['desc']}{bcolors.DEFAULT} - "
+              f"{bcolors.GREEN}{format_currency(product['price'])}{bcolors.DEFAULT} "
+              f"({bcolors.PURPLE}{product['quantity']}{bcolors.DEFAULT} st)")
 
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')   
 
@@ -81,47 +96,51 @@ while True:
     os.system('cls')
     show_products(products)
     
-    print("\nvälj en åtgärd:")
+    print(f"\n{bcolors.BOLD}välj en åtgärd:{bcolors.DEFAULT}")
     print("1. sök produkt via ID")
     print("2. ta bort produkt")
     print("3. lägg till produkt")
     print("4. avsluta")
     
-    choice = input("\nvälj (1-4): ")
+    choice = input(f"\n{bcolors.CYAN}välj (1-4): {bcolors.DEFAULT}")
     
     if choice == '1':
         try:
-            product_id = int(input("\nange ID på produkten du söker: "))
+            product_id = int(input(f"\n{bcolors.CYAN}ange ID på produkten du söker: {bcolors.DEFAULT}"))
             product = get_product_by_id(products, product_id)
+
             if product:
-                print(f"\nhittade produkt: {product['name']} {product['desc']} - {format_currency(product['price'])}")
+                print(f"\n{bcolors.GREEN}hittade produkt: {product['name']} {product['desc']} - {format_currency(product['price'])}{bcolors.DEFAULT}")
             else:
-                print(f"\ningen produkt hittades med ID {product_id}")
-        except ValueError:
-            print("\nogiltigt ID format")
-    
+                print(f"\n{bcolors.RED}ingen produkt hittades med ID {product_id}{bcolors.DEFAULT}")
+        except:
+            print(f"\n{bcolors.RED}ogiltigt ID format{bcolors.DEFAULT}")
+
     elif choice == '2':
         try:
-            product_id = int(input("\nange ID på produkten du vill ta bort: "))
+            product_id = int(input(f"\n{bcolors.CYAN}ange ID på produkten du vill ta bort: {bcolors.DEFAULT}"))
             old_len = len(products)
             products = remove_product_by_id(products, product_id)
+
             if len(products) < old_len:
-                print(f"\nprodukt med ID {product_id} har tagits bort")
-                save_data(filename, products)
+                print(f"\n{bcolors.GREEN}produkt med ID {product_id} har tagits bort{bcolors.DEFAULT}")
+                if not save_data(filename, products):
+                    print(f"{bcolors.RED}ändringen kommer inte sparas nästa session{bcolors.DEFAULT}")
             else:
-                print(f"\ningen produkt hittades med ID {product_id}")
-        except ValueError:
-            print("\nogiltigt ID format")
-    
+                print(f"\n{bcolors.RED}ingen produkt hittades med ID {product_id}{bcolors.DEFAULT}")
+        except:
+            print(f"\n{bcolors.RED}ogiltigt ID format{bcolors.DEFAULT}")
+
     elif choice == '3':
         products = add_product(products)
-        save_data(filename, products)
-    
+        if not save_data(filename, products):
+            print(f"{bcolors.RED}ändringen kommer inte sparas nästa session{bcolors.DEFAULT}")
+
     elif choice == '4':
-        print("\navslutar programmet...")
+        print(f"\n{bcolors.YELLOW}avslutar programmet...{bcolors.DEFAULT}")
         break
-    
+
     else:
-        print("\nogiltigt val, försök igen")
-    
-    input("\ntryck Enter för att fortsätta...")
+        print(f"\n{bcolors.RED}ogiltigt val, försök igen{bcolors.DEFAULT}")
+
+    input(f"\n{bcolors.CYAN}tryck Enter för att fortsätta...{bcolors.DEFAULT}")
