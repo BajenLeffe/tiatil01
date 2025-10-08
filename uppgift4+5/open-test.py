@@ -3,16 +3,18 @@ import os
 import locale
 from colors import bcolors
 
+# formaterar tal till svensk valuta
 def format_currency(value):
     return locale.currency(value,grouping=True)
 
+# läser in data från CSV-filen
 def load_data(filename): 
-    products = []
+    products = []   
     
     with open(filename, encoding='utf-8', mode='r') as file: 
         reader = csv.DictReader(file)
         for row in reader:
-                
+                # skapar en produkt från varje rad i CSV-filen
                 product = {
                     "id": int(row['id']),
                     "name": row['name'],
@@ -22,35 +24,39 @@ def load_data(filename):
                 }
                 products.append(product)
     
+    # sorterar produkter efter ID
     products.sort(key=lambda x: x['id'])
-
     return products
 
+# hittar en produkt med specifikt ID
 def get_product_by_id(products, product_id):
     for product in products:
         if product['id'] == product_id:
             return product
     return None
 
+# tar bort en produkt med specifikt ID
 def remove_product_by_id(products, product_id):
     new_products = []
-
     for product in products:
         if product['id'] != product_id:
             new_products.append(product)
     return new_products
 
+# lägger till en ny produkt
 def add_product(products):
     print("\nlägg till en ny produkt")
     
-    # ta reda på högsta ID och lägg till 1
+    # hittar nästa lediga ID-nummer
     new_id = max(products, key=lambda x: x['id'])['id'] + 1
     
+    # frågar användaren efter produktinformation
     new_name = input("ange produktens namn: ")
     new_desc = input("ange produktens beskrivning: ")
     new_price = float(input("ange produktens pris: "))
     new_quantity = int(input("ange produktens antal: "))
 
+    # skapar ny produkt och lägger till i listan
     new_product = {
         "id": new_id,
         "name": new_name,
@@ -63,6 +69,7 @@ def add_product(products):
     print(f"\nprodukten '{new_name}' har lagts till!\n")
     return products
 
+# sparar produktlistan till CSV-fil
 def save_data(filename, products):
     try:
         fieldnames = ['id', 'name', 'desc', 'price', 'quantity']
@@ -77,6 +84,7 @@ def save_data(filename, products):
         print("\nFEL: kan inte spara - filen är skrivskyddad")
         return False
 
+# visar alla produkter i listan
 def show_products(products):
     print(f"\n{bcolors.BOLD}Aktuell produktlista:{bcolors.DEFAULT}\n")
 
@@ -86,16 +94,19 @@ def show_products(products):
               f"{bcolors.GREEN}{format_currency(product['price'])}{bcolors.DEFAULT} "
               f"({bcolors.PURPLE}{product['quantity']}{bcolors.DEFAULT} st)")
 
+# ställer in svensk lokalisering
 locale.setlocale(locale.LC_ALL, 'sv_SE.UTF-8')   
 
-
+# programmets huvuddel
 filename = 'db_products.csv'
 products = load_data(filename)
 
+# huvudmenyn
 while True:
-    os.system('cls')
+    os.system('cls')  # rensar skärmen
     show_products(products)
     
+    # visar menyval
     print(f"\n{bcolors.BOLD}välj en åtgärd:{bcolors.DEFAULT}")
     print("1. sök produkt via ID")
     print("2. ta bort produkt")
@@ -104,7 +115,8 @@ while True:
     
     choice = input(f"\n{bcolors.CYAN}välj (1-4): {bcolors.DEFAULT}")
     
-    if choice == '1':
+    # hantera användarens val
+    if choice == '1':  # sök produkt
         try:
             product_id = int(input(f"\n{bcolors.CYAN}ange ID på produkten du söker: {bcolors.DEFAULT}"))
             product = get_product_by_id(products, product_id)
@@ -116,7 +128,7 @@ while True:
         except:
             print(f"\n{bcolors.RED}ogiltigt ID format{bcolors.DEFAULT}")
 
-    elif choice == '2':
+    elif choice == '2':  # ta bort produkt
         try:
             product_id = int(input(f"\n{bcolors.CYAN}ange ID på produkten du vill ta bort: {bcolors.DEFAULT}"))
             old_len = len(products)
@@ -131,16 +143,16 @@ while True:
         except:
             print(f"\n{bcolors.RED}ogiltigt ID format{bcolors.DEFAULT}")
 
-    elif choice == '3':
+    elif choice == '3':  # lägg till produkt
         products = add_product(products)
         if not save_data(filename, products):
             print(f"{bcolors.RED}ändringen kommer inte sparas nästa session{bcolors.DEFAULT}")
 
-    elif choice == '4':
+    elif choice == '4':  # avsluta programmet
         print(f"\n{bcolors.YELLOW}avslutar programmet...{bcolors.DEFAULT}")
         break
 
-    else:
+    else:  # ogiltigt val
         print(f"\n{bcolors.RED}ogiltigt val, försök igen{bcolors.DEFAULT}")
 
     input(f"\n{bcolors.CYAN}tryck Enter för att fortsätta...{bcolors.DEFAULT}")
