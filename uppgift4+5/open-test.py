@@ -2,6 +2,7 @@ import csv
 import os
 import locale
 from colors import bcolors
+from msvcrt import getwch
 
 # formaterar tal till svensk valuta
 def format_currency(value):
@@ -113,7 +114,9 @@ while True:
     print("3. lägg till produkt")
     print("4. avsluta")
     
-    choice = input(f"\n{bcolors.CYAN}välj (1-4): {bcolors.DEFAULT}")
+    print(f"\n{bcolors.CYAN}välj (1-4): {bcolors.DEFAULT}", end='', flush=True)
+    choice = getwch()  # använder getwch istället för input
+    print(choice)  # visar vald siffra
     
     # hantera användarens val
     if choice == '1':  # sök produkt
