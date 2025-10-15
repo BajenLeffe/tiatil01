@@ -32,7 +32,7 @@ def load_data(filename):
 # hittar en produkt med specifikt ID
 def get_product_by_id(products, product_id):
     for product in products:
-        if product['id'] == product_id:
+        if product['id'] == product_id:  # kollar om produktens ID matchar det som sökes
             return product
     return None
 
